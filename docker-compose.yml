@@ -1,0 +1,24 @@
+service:
+  filebrowser:
+    image: filebrowser/filebrowser:latest
+    container_name: filebrowser   
+
+  # Map a port for web access (e.g., 8080)
+  ports:
+    - "8080:80"
+  environment:
+    # Use PUID/PGID from your .env file
+    - PUID=$SAMBA_PUID
+    - PGID=$SAMBA_PGID
+    - TZ=$TZ
+  volumes:
+    # Persistence for FileBrowser's settings and user database
+    - /home/tinman/docker/filebrowser/config:/config
+    
+    # CRITICAL: Map your entire NAS directory for management
+    - $HOST_DISK_1_PATH: /srv/disk1:rw
+    - $HOST_DISK_2_PATH: /src/disk2:rw
+
+    # Optional: Set the root directory for the web interface
+    - /:/srv/
+  restart: unless-stopped
