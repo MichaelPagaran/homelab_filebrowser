@@ -24,3 +24,8 @@ services:
       - /:/srv/
       
     restart: unless-stopped
+
+# --- TOP LEVEL NETWORK DEFINITION (MUST REMAIN IN THE FILE) ---
+networks:
+  app_net:
+    external: true
