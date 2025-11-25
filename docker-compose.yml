@@ -11,9 +11,7 @@ services:
       - PGID=$SAMBA_PGID
       - TZ=$TZ
 
-    # --- ADD entrypoint and command ---
-    entrypoint: ["/entrypoint.sh"]
-    command: ["-auth.method=pam"] # Instructs FileBrowser to use PAM for authentication
+    command: ["/filebrowser", "-auth.method=pam"] # Passes the PAM flag to the main executable
     
     volumes:
       # Persistence for FileBrowser's configuration, database, and user settings
