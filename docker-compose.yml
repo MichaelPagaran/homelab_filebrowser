@@ -7,32 +7,24 @@ services:
       - "8080:80" 
       
     environment:
+      # These are still essential for host permission enforcement
       - PUID=$SAMBA_PUID
       - PGID=$SAMBA_PGID
       - TZ=$TZ
 
-    # --- CORRECTION APPLIED HERE: USING THE FULL BINARY PATH ---
-    # The actual executable is usually located in a standard bin directory.
-    # Passes the PAM flag to the main executable
-    entrypoint: ["/usr/bin/filebrowser"] 
-    command: ["-auth.method=pam"] 
-    
     volumes:
+      # Persistence for FileBrowser's configuration, database, and user settings
       - /home/tinman/docker/filebrowser/config:/config
+      
+      # CRITICAL: Map your NAS disks to paths inside the container
       - $HOST_DISK_1_PATH:/srv/Disk_1_Shared:rw
       - $HOST_DISK_2_PATH:/srv/Disk_2_Private:rw
       
-      # NOTE: The /:/srv/ volume mount is often problematic and may be contributing 
-      # to instability. It is only required if you want FileBrowser to see the whole 
-      # file system. For now, let's keep it, but it should be noted as a source of complexity.
+      # Set the root directory for the web interface
       - /:/srv/ 
       
     networks:
       - app_net
 
     restart: unless-stopped
-
-# --- TOP LEVEL NETWORK DEFINITION ---
-networks:
-  app_net:
-    external: true
+# ... (rest of the YML file)
