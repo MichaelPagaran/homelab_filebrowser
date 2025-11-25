@@ -11,7 +11,9 @@ services:
       - PGID=$SAMBA_PGID
       - TZ=$TZ
 
-    command: "/filebrowser -auth.method=pam" # Passes the PAM flag to the main executable
+    # Passes the PAM flag to the main executable
+    entrypoint: ["/filebrowser"]
+    command: ["-auth.method=pam"] 
     
     volumes:
       # Persistence for FileBrowser's configuration, database, and user settings
