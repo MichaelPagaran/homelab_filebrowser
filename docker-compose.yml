@@ -10,6 +10,11 @@ services:
       - PUID=$SAMBA_PUID
       - PGID=$SAMBA_PGID
       - TZ=$TZ
+
+    # --- ADD entrypoint and command ---
+    entrypoint: ["/entrypoint.sh"]
+    command: ["-auth.method=pam"] # Instructs FileBrowser to use PAM for authentication
+    
     volumes:
       # Persistence for FileBrowser's configuration, database, and user settings
       - /home/tinman/docker/filebrowser/config:/config
