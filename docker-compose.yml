@@ -1,24 +1,26 @@
-service:
+services:
   filebrowser:
-    image: filebrowser/filebrowser:latest
-    container_name: filebrowser   
-
-  # Map a port for web access (e.g., 8080)
-  ports:
-    - "8080:80"
-  environment:
-    # Use PUID/PGID from your .env file
-    - PUID=$SAMBA_PUID
-    - PGID=$SAMBA_PGID
-    - TZ=$TZ
-  volumes:
-    # Persistence for FileBrowser's settings and user database
-    - /home/tinman/docker/filebrowser/config:/config
-    
-    # CRITICAL: Map your entire NAS directory for management
-    - $HOST_DISK_1_PATH: /srv/disk1:rw
-    - $HOST_DISK_2_PATH: /src/disk2:rw
-
-    # Optional: Set the root directory for the web interface
-    - /:/srv/
-  restart: unless-stopped
+    image: filebrowser/filebrowser
+    container_name: filebrowser
+    # We will use port 8080 for web access
+    ports:
+      - "8080:80" 
+    environment:
+      # PUID and PGID are used to ensure FileBrowser respects host permissions
+      - PUID=$SAMBA_PUID
+      - PGID=$SAMBA_PGID
+      - TZ=$TZ
+    volumes:
+      # Persistence for FileBrowser's configuration, database, and user settings
+      - /home/tinman/docker/filebrowser/config:/config
+      
+      # CRITICAL: Map your NAS disks to paths inside the container
+      # FileBrowser will see 'Disk 1 Shared' and 'Disk 2 Private' as separate folders.
+      - $HOST_DISK_1_PATH:/srv/Disk_1_Shared:rw
+      - $HOST_DISK_2_PATH:/srv/Disk_2_Private:rw
+      
+      # Set the root directory for the web interface to display the mapped drives
+      # FileBrowser users will see the contents of /srv/
+      - /:/srv/
+      
+    restart: unless-stopped
