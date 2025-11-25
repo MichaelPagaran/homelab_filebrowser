@@ -7,11 +7,11 @@ services:
       - "8080:80" 
       
     environment:
-      # These are still essential for host permission enforcement
+      # PUID/PGID and TZ from .env are required for host permission enforcement
       - PUID=$SAMBA_PUID
       - PGID=$SAMBA_PGID
       - TZ=$TZ
-
+    
     volumes:
       # Persistence for FileBrowser's configuration, database, and user settings
       - /home/tinman/docker/filebrowser/config:/config
@@ -19,12 +19,14 @@ services:
       # CRITICAL: Map your NAS disks to paths inside the container
       - $HOST_DISK_1_PATH:/srv/Disk_1_Shared:rw
       - $HOST_DISK_2_PATH:/srv/Disk_2_Private:rw
-      
-      # Set the root directory for the web interface
       - /:/srv/ 
       
+    # 1. Reference the network the service should join
     networks:
       - app_net
 
     restart: unless-stopped
-# ... (rest of the YML file)
+
+networks:
+  app_net:
+    external: true
