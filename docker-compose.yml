@@ -1,32 +1,25 @@
 services:
   filebrowser:
-    image: filebrowser/filebrowser
+    # Pinned via .env so upstream updates never change behavior unannounced
+    image: filebrowser/filebrowser:${FB_VERSION:?pin FB_VERSION in .env}
     container_name: filebrowser
-    
+
+    # Run as the same UID:GID as qBittorrent so both can read/write the same files
+    user: "${PUID:?set PUID in .env}:${PGID:?set PGID in .env}"
+
     ports:
-      - "8080:80" 
-      
+      # 8080 is taken by the qBittorrent Web UI
+      - "${FB_PORT:-8081}:80"
+
     environment:
-      # PUID/PGID and TZ from .env are required for host permission enforcement
-      - PUID=$SAMBA_PUID
-      - PGID=$SAMBA_PGID
-      - TZ=$TZ
-    
+      - TZ=${TZ:-UTC}
+
     volumes:
-      # Persistence for FileBrowser's configuration, database, and user settings
-      - /home/tinman/docker/filebrowser/config:/config
-      
-      # CRITICAL: Map your NAS disks to paths inside the container
-      - $HOST_DISK_1_PATH:/srv/Disk_1_Shared:rw
-      - $HOST_DISK_2_PATH:/srv/Disk_2_Private:rw
-      - /:/srv/ 
-      
-    # 1. Reference the network the service should join
-    networks:
-      - app_net
+      # FileBrowser's settings and user database (persist across restarts)
+      - ${FB_CONFIG_PATH:-./config}:/config
+      - ${FB_DATABASE_PATH:-./database}:/database
+
+      # Only the qBittorrent downloads folder is exposed, never the whole host
+      - ${DOWNLOADS_PATH:?DOWNLOADS_PATH must be set in .env}:/srv/downloads:rw
 
     restart: unless-stopped
-
-networks:
-  app_net:
-    external: true
